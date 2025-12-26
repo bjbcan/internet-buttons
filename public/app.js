@@ -1,19 +1,7 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     const buttonGrid = document.getElementById('buttonGrid');
     const statusDiv = document.getElementById('status');
     let updateInterval;
-    let BACK_END_URL = '';
-
-    // Fetch config from server to get BACK_END_URL
-    try {
-        const configResponse = await fetch('api/config');
-        const config = await configResponse.json();
-        BACK_END_URL = config.BACK_END_URL || '';
-    } catch (error) {
-        console.error('Error fetching config from backend ({BACK_END_URL})', 
-            BACK_END_URL, 'error:', error.message);
-        // Continue with empty BACK_END_URL (relative URLs)
-    }
 
     // Get num parameter from URL, default to 5
     function getNumFromURL() {
@@ -26,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function updateButtons() {
         try {
             const num = getNumFromURL();
-            const response = await fetch(`${BACK_END_URL}/api/getDomainStatusAll?num=${num}`);
+            const response = await fetch(`api/getDomainStatusAll?num=${num}`);
             const data = await response.json();
             
             if (!response.ok) {
@@ -65,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     showStatus('Updating status...', 'info');
                     
                     try {
-                        const response = await fetch(`${BACK_END_URL}/api/setDomainStatus`, {
+                        const response = await fetch(`api/setDomainStatus`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -133,10 +121,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="env-info-item">
                         <span class="env-info-label">PIHOLE_API_URL:</span>
                         <span class="env-info-value">${config.PIHOLE_API_URL || 'N/A'}</span>
-                    </div>
-                    <div class="env-info-item">
-                        <span class="env-info-label">BACK_END_URL:</span>
-                        <span class="env-info-value">${config.BACK_END_URL || 'N/A'}</span>
                     </div>
                 `;
                 envInfo.style.display = 'block';

@@ -43,7 +43,6 @@ app.use(express.static('public'));
 // Config endpoint for front-end to get environment variables
 app.get('/api/config', (req, res) => {
   res.json({
-    BACK_END_URL: BACK_END_URL,
     APP_PORT: APP_PORT,
     PIHOLE_API_URL: PIHOLE_API_URL
   });
