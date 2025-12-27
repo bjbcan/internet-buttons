@@ -13,9 +13,17 @@
             <!-- Buttons will be dynamically generated -->
         </div>
         <div id="status" class="status-message"></div>
-        <div class="env-section">
-            <button id="envToggle" class="env-toggle-btn">Show Environment Variables</button>
-            <div id="envInfo" class="env-info" style="display: none;"></div>
+        <div class="blocking-component">
+            <div id="blockingStatusContainer" class="blocking-status-container">
+                <div id="blockingStatusDisplay" class="blocking-status-display">
+                    Loading...
+                </div>
+                <div id="timerOptions" class="timer-options" style="display: none;">
+                    <a href="#" class="timer-option-link" data-timer="300">5 min</a>
+                    <a href="#" class="timer-option-link" data-timer="600">10 min</a>
+                    <a href="#" class="timer-option-link" data-timer="1800">30 min</a>
+                </div>
+            </div>
         </div>
     </div>
     <script src="app.js"></script>

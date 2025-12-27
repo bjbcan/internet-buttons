@@ -22,6 +22,9 @@ const axiosInstance = axios.create({
 // Global variable to store indexed result - accessible by all functions
 let indexedResult = {};
 
+// Global variable to store blocking status
+let blockingStatus = { blocking: false, timer: 0 };
+
 // Middleware - CORS headers to allow requests from any origin
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -107,6 +110,8 @@ app.get('/api/getDomainStatusAll', async (req, res) => {
       return acc;
     }, {});
     
+
+    
     // Get num parameter from query, default to 5
     const num = parseInt(req.query.num) || 5;
     
@@ -120,6 +125,9 @@ app.get('/api/getDomainStatusAll', async (req, res) => {
     // Output to console
     // console.log(JSON.stringify(indexedResult));
 
+    // Get and store blocking status
+    blockingStatus = await getBlockingStatus();
+        
     res.json(limitedResult);
   } catch (error) {
     console.error('Error getting domain status all:', error.message);
@@ -129,6 +137,84 @@ app.get('/api/getDomainStatusAll', async (req, res) => {
     });
   }
 });
+
+app.get('/api/getBlockingStatus', async (req, res) => {
+  try {
+    // Get current blocking status
+    blockingStatus = await getBlockingStatus();
+    res.json(blockingStatus);
+  } catch (error) {
+    console.error('Error getting blocking status:', error.message);
+    res.status(500).json({
+      error: 'Failed to get blocking status',
+      message: error.message
+    });
+  }
+});
+
+app.post('/api/setBlockingStatus', async (req, res) => {
+  try {
+
+    // Get blocking and timer from request body
+    const { blocking, timer } = req.body;
+    
+    // Validate that both arguments are provided
+    if (blocking === undefined || timer === undefined) {
+      return res.status(400).json({
+        error: 'Missing required parameters',
+        message: 'Both blocking and timer are required'
+      });
+    }
+    
+    // Make POST request to PiHole API
+    const response = await axiosInstance.post(`${PIHOLE_API_URL}/dns/blocking`, {
+      blocking: blocking,
+      timer: blocking === true ? 0 : timer
+    });
+    
+    // Update global blockingStatus variable
+    blockingStatus = {
+      blocking: blocking === true,
+      timer: typeof timer === 'number' ? timer : parseInt(timer) || 0
+    };
+    
+    // console.log("blockingStatus:", blockingStatus);
+    // console.log("response.data:", response.data);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error setting blocking status:', error.message);
+    res.status(error.response?.status || 500).json({
+      error: 'Failed to set blocking status',
+      message: error.message
+    });
+  }
+});
+
+// Function to get blocking status from PiHole API
+async function getBlockingStatus() {
+  try {
+    const response = await axiosInstance.get(`${PIHOLE_API_URL}/dns/blocking`);
+    
+    // Extract blocking and timer from response
+    // API returns blocking as a string: "enabled", "disabled", "failed", or "unknown"
+    // Map "enabled" to true, all others to false
+    const blockingString = response.data.blocking || '';
+    const blocking = blockingString === 'enabled';
+    const timer = response.data.timer || 0;
+    
+    // Store in global variable
+    blockingStatus = {
+      blocking: blocking,
+      timer: typeof timer === 'number' ? timer : parseInt(timer) || 0
+    };
+    // console.log("blockingStatus:", blockingStatus);
+    return blockingStatus;
+  } catch (error) {
+    console.error('Error getting blocking status:', error.message);
+    // Return current blockingStatus on error
+    return blockingStatus;
+  }
+}
 
 // Serve front-end
 app.get('/', (req, res) => {

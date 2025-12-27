@@ -91,52 +91,115 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Blocking status component
+    const blockingStatusContainer = document.getElementById('blockingStatusContainer');
+    const blockingStatusDisplay = document.getElementById('blockingStatusDisplay');
+    const timerOptions = document.getElementById('timerOptions');
+    let currentBlockingStatus = { blocking: false, timer: 0 };
+
+    // Function to fetch and update blocking status
+    async function updateBlockingStatus() {
+        try {
+            const response = await fetch('api/getBlockingStatus');
+            const data = await response.json();
+            
+            if (response.ok) {
+                currentBlockingStatus = data;
+                
+                if (data.blocking === false) {
+                    // Disabled - show timer rounded down to nearest minute, light red background
+                    const minutes = Math.floor(data.timer / 60);
+                    const displayText = `Adblocking disabled: ${minutes} min`;
+                    blockingStatusDisplay.textContent = displayText;
+                    blockingStatusDisplay.className = 'blocking-status-display disabled-status';
+                    timerOptions.style.display = 'none';
+                    // Hide button grid when blocking is disabled
+                    buttonGrid.style.display = 'none';
+                } else {
+                    // Enabled - show enabled status
+                    blockingStatusDisplay.textContent = 'Adblocking Enabled';
+                    blockingStatusDisplay.className = 'blocking-status-display enabled-status';
+                    timerOptions.style.display = 'none';
+                    // Show button grid when blocking is enabled
+                    buttonGrid.style.display = 'grid';
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching blocking status:', error);
+        }
+    }
+
+    // Function to set blocking status
+    async function setBlockingStatus(blocking, timer) {
+        try {
+            const response = await fetch('api/setBlockingStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    blocking: blocking,
+                    timer: timer
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                showStatus('Blocking status updated successfully', 'success');
+                await updateBlockingStatus();
+            } else {
+                showStatus(`Error: ${data.error || 'Failed to update blocking status'}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error setting blocking status:', error);
+            showStatus(`Error: ${error.message}`, 'error');
+        }
+    }
+
+    // Handle click on blocking status display
+    blockingStatusDisplay.addEventListener('click', () => {
+        if (currentBlockingStatus.blocking === false) {
+            // Disabled - re-enable indefinitely
+            setBlockingStatus(true, 0);
+        } else {
+            // Enabled - show timer options
+            timerOptions.style.display = timerOptions.style.display === 'none' ? 'flex' : 'none';
+        }
+    });
+
+    // Handle timer option clicks
+    const timerOptionLinks = document.querySelectorAll('.timer-option-link');
+    timerOptionLinks.forEach(link => {
+        link.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const timer = parseInt(link.getAttribute('data-timer'));
+            await setBlockingStatus(false, timer);
+            timerOptions.style.display = 'none';
+        });
+    });
+
+    // Hide timer options when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!blockingStatusContainer.contains(e.target)) {
+            timerOptions.style.display = 'none';
+        }
+    });
+
     // Initial load
     updateButtons();
+    updateBlockingStatus();
 
     // Update every 10 seconds
-    updateInterval = setInterval(updateButtons, 5000);
+    updateInterval = setInterval(() => {
+        updateButtons();
+        updateBlockingStatus();
+    }, 10000);
 
     function showStatus(message, type) {
         statusDiv.textContent = message;
         statusDiv.className = `status-message ${type}`;
     }
-
-    // Environment variables toggle
-    const envToggle = document.getElementById('envToggle');
-    const envInfo = document.getElementById('envInfo');
-    let envVisible = false;
-
-    envToggle.addEventListener('click', async () => {
-        if (!envVisible) {
-            try {
-                const configResponse = await fetch('api/config');
-                const config = await configResponse.json();
-                
-                envInfo.innerHTML = `
-                    <div class="env-info-item">
-                        <span class="env-info-label">APP_PORT:</span>
-                        <span class="env-info-value">${config.APP_PORT || 'N/A'}</span>
-                    </div>
-                    <div class="env-info-item">
-                        <span class="env-info-label">PIHOLE_API_URL:</span>
-                        <span class="env-info-value">${config.PIHOLE_API_URL || 'N/A'}</span>
-                    </div>
-                `;
-                envInfo.style.display = 'block';
-                envToggle.textContent = 'Hide Environment Variables';
-                envVisible = true;
-            } catch (error) {
-                console.error('Error fetching environment variables:', error);
-                envInfo.innerHTML = '<div class="env-info-item">Error loading environment variables</div>';
-                envInfo.style.display = 'block';
-            }
-        } else {
-            envInfo.style.display = 'none';
-            envToggle.textContent = 'Show Environment Variables';
-            envVisible = false;
-        }
-    });
 
     // Cleanup interval on page unload
     window.addEventListener('beforeunload', () => {

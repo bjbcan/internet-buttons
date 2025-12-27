@@ -168,6 +168,242 @@ h1 {
     word-break: break-all;
 }
 
+.blocking-status-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.blocking-status-header {
+    margin-bottom: 15px;
+}
+
+.blocking-status-header h2 {
+    font-size: 1.5em;
+    color: #333;
+    margin: 0;
+    text-align: center;
+}
+
+.blocking-status-info {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+}
+
+.blocking-status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.blocking-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9em;
+}
+
+.blocking-value {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #212529;
+    font-family: 'Courier New', monospace;
+}
+
+#blockingStatusValue.blocking-enabled {
+    color: #28a745;
+}
+
+#blockingStatusValue.blocking-disabled {
+    color: #dc3545;
+}
+
+.blocking-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.blocking-toggle-btn {
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.blocking-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.blocking-toggle-btn:active {
+    transform: translateY(0);
+}
+
+.blocking-toggle-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.timer-input {
+    padding: 12px 16px;
+    font-size: 1em;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    width: 150px;
+    text-align: center;
+}
+
+.timer-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.timer-set-btn {
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
+
+.timer-set-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
+}
+
+.timer-set-btn:active {
+    transform: translateY(0);
+}
+
+.timer-set-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.blocking-component {
+    margin-top: 20px;
+    position: relative;
+}
+
+.power-icon-wrapper {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.power-icon-btn {
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    padding: 5px 15px;
+    transition: transform 0.2s ease;
+    color: #667eea;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.power-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    position: relative;
+}
+
+.power-icon::after {
+    content: '';
+    position: absolute;
+    bottom: -0.3em;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 0.4em;
+    background-color: currentColor;
+}
+
+.power-icon-btn:hover {
+    transform: scale(1.1);
+}
+
+.blocking-status-container {
+    margin-top: 10px;
+}
+
+.blocking-status-display {
+    padding: 15px 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.blocking-status-display.disabled-status {
+    background-color: #ffcccc;
+    color: #721c24;
+    border: 2px solid #f5c6cb;
+}
+
+.blocking-status-display.enabled-status {
+    background-color: #d4edda;
+    color: #155724;
+    border: 2px solid #c3e6cb;
+}
+
+.blocking-status-display:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.timer-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.timer-option-link {
+    padding: 8px 16px;
+    background-color: #667eea;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.timer-option-link:hover {
+    background-color: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
 @media (max-width: 768px) {
     .button-grid {
         grid-template-columns: repeat(2, 1fr);
