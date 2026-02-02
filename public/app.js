@@ -3,17 +3,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusDiv = document.getElementById('status');
     let updateInterval;
 
-    // Get num parameter from URL, default to 5
-    function getNumFromURL() {
+    // Get num from dropdown or URL parameter, default to 5
+    function getNum() {
+        const numButtonsSelect = document.getElementById('numButtonsSelect');
+        if (numButtonsSelect) {
+            return parseInt(numButtonsSelect.value) || 5;
+        }
         const urlParams = new URLSearchParams(window.location.search);
         const num = parseInt(urlParams.get('num'));
         return num && num > 0 ? num : 5;
     }
 
+    // Initialize dropdown from URL parameter
+    function initializeDropdown() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const num = parseInt(urlParams.get('num'));
+        const numButtonsSelect = document.getElementById('numButtonsSelect');
+        if (numButtonsSelect && num && num > 0) {
+            numButtonsSelect.value = num;
+        }
+    }
+
     // Function to fetch and update buttons
     async function updateButtons() {
         try {
-            const num = getNumFromURL();
+            const num = getNum();
             const response = await fetch(`api/getDomainStatusAll?num=${num}`);
             const data = await response.json();
             
@@ -110,16 +124,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Disabled - show timer rounded down to nearest minute, light red background
                     const minutes = Math.floor(data.timer / 60);
                     const displayText = `Adblocking disabled: ${minutes} min`;
-                    blockingStatusDisplay.textContent = displayText;
+                    let statusText = blockingStatusDisplay.querySelector('.blocking-status-text');
+                    if (!statusText) {
+                        statusText = document.createElement('span');
+                        statusText.className = 'blocking-status-text';
+                        blockingStatusDisplay.insertBefore(statusText, timerOptions);
+                    }
+                    statusText.textContent = displayText;
                     blockingStatusDisplay.className = 'blocking-status-display disabled-status';
                     timerOptions.style.display = 'none';
+                    blockingStatusDisplay.classList.remove('darkened');
                     // Hide button grid when blocking is disabled
                     buttonGrid.style.display = 'none';
                 } else {
                     // Enabled - show enabled status
-                    blockingStatusDisplay.textContent = 'Adblocking Enabled';
+                    let statusText = blockingStatusDisplay.querySelector('.blocking-status-text');
+                    if (!statusText) {
+                        statusText = document.createElement('span');
+                        statusText.className = 'blocking-status-text';
+                        blockingStatusDisplay.insertBefore(statusText, timerOptions);
+                    }
+                    statusText.textContent = 'Adblocking Enabled';
                     blockingStatusDisplay.className = 'blocking-status-display enabled-status';
                     timerOptions.style.display = 'none';
+                    blockingStatusDisplay.classList.remove('darkened');
                     // Show button grid when blocking is enabled
                     buttonGrid.style.display = 'grid';
                 }
@@ -164,7 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
             setBlockingStatus(true, 0);
         } else {
             // Enabled - show timer options
-            timerOptions.style.display = timerOptions.style.display === 'none' ? 'flex' : 'none';
+            const isVisible = timerOptions.style.display !== 'none';
+            if (isVisible) {
+                timerOptions.style.display = 'none';
+                blockingStatusDisplay.classList.remove('darkened');
+            } else {
+                timerOptions.style.display = 'flex';
+                blockingStatusDisplay.classList.add('darkened');
+            }
         }
     });
 
@@ -176,6 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const timer = parseInt(link.getAttribute('data-timer'));
             await setBlockingStatus(false, timer);
             timerOptions.style.display = 'none';
+            blockingStatusDisplay.classList.remove('darkened');
         });
     });
 
@@ -183,10 +219,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (e) => {
         if (!blockingStatusContainer.contains(e.target)) {
             timerOptions.style.display = 'none';
+            blockingStatusDisplay.classList.remove('darkened');
         }
     });
 
+    // Footer dropdown handler
+    const numButtonsSelect = document.getElementById('numButtonsSelect');
+    if (numButtonsSelect) {
+        numButtonsSelect.addEventListener('change', () => {
+            const num = parseInt(numButtonsSelect.value);
+            // Update URL parameter
+            const url = new URL(window.location);
+            url.searchParams.set('num', num);
+            window.history.pushState({}, '', url);
+            // Refresh buttons
+            updateButtons();
+        });
+    }
+
     // Initial load
+    initializeDropdown();
     updateButtons();
     updateBlockingStatus();
 
@@ -197,8 +249,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 10000);
 
     function showStatus(message, type) {
+        // Save the link before clearing content
+        const existingLink = statusDiv.querySelector('.status-link');
+        const link = existingLink || (() => {
+            const newLink = document.createElement('a');
+            newLink.href = 'https://pi.hole/admin/queries';
+            newLink.className = 'status-link';
+            newLink.target = '_blank';
+            newLink.textContent = '>';
+            return newLink;
+        })();
+        
+        // Set the message text (this removes all children including the link)
         statusDiv.textContent = message;
         statusDiv.className = `status-message ${type}`;
+        
+        // Re-add the link
+        statusDiv.appendChild(link);
     }
 
     // Cleanup interval on page unload

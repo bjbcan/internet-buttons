@@ -10,26 +10,43 @@
     <link rel="shortcut icon" href="/buttons/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/buttons/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Screenager" />
-\</head>
+</head>
 <body>
     <div class="container">
-        <h1>Screenager Internet Control</h1>
+        <h1>Screenager
+        </h1>
         <div class="button-grid" id="buttonGrid">
             <!-- Buttons will be dynamically generated -->
         </div>
-        <div id="status" class="status-message"></div>
         <div class="blocking-component">
             <div id="blockingStatusContainer" class="blocking-status-container">
-                <div id="blockingStatusDisplay" class="blocking-status-display">
-                    Loading...
-                </div>
-                <div id="timerOptions" class="timer-options" style="display: none;">
-                    <a href="#" class="timer-option-link" data-timer="300">5 min</a>
-                    <a href="#" class="timer-option-link" data-timer="600">10 min</a>
-                    <a href="#" class="timer-option-link" data-timer="1800">30 min</a>
+                <div class="blocking-status-row">
+                    <div id="blockingStatusDisplay" class="blocking-status-display">
+                        <span class="blocking-status-text">Loading...</span>
+                        <div id="timerOptions" class="timer-options" style="display: none;">
+                            <a href="#" class="timer-option-link" data-timer="300">5 min</a>
+                            <a href="#" class="timer-option-link" data-timer="600">10 min</a>
+                            <a href="#" class="timer-option-link" data-timer="1800">30 min</a>
+                        </div>
+                    </div>
+                    <div class="dropdown-wrapper">
+                        <label for="numButtonsSelect"></label>
+                        <select id="numButtonsSelect" class="num-buttons-select">
+                            <option value="5" selected>5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
+        <div id="status" class="status-message">
+            <a href="https://pi.hole/admin/queries" class="status-link" target="_blank">></a>
+        </div>
+
     </div>
     <script src="app.js"></script>
 </body>

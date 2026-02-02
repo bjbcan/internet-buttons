@@ -90,6 +90,22 @@ h1 {
     box-shadow: none;
     cursor: default;
     font-weight: normal;
+    margin-top: 30px;
+    position: relative;
+}
+
+.status-link {
+    position: absolute;
+    right: 20px;
+    color: #667eea;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.status-link:hover {
+    color: #5568d3;
 }
 
 .status-message.success {
@@ -350,6 +366,17 @@ h1 {
 
 .blocking-status-container {
     margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+}
+
+.blocking-status-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
 }
 
 .blocking-status-display {
@@ -361,6 +388,18 @@ h1 {
     cursor: pointer;
     transition: all 0.3s ease;
     user-select: none;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.blocking-status-display.darkened .blocking-status-text {
+    opacity: 0.3;
+}
+
+.blocking-status-text {
+    position: relative;
+    z-index: 1;
 }
 
 .blocking-status-display.disabled-status {
@@ -381,11 +420,20 @@ h1 {
 }
 
 .timer-options {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 15px;
-    margin-top: 10px;
     padding: 10px;
+    border-radius: 8px;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(2px);
 }
 
 .timer-option-link {
@@ -402,6 +450,40 @@ h1 {
     background-color: #5568d3;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.dropdown-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropdown-wrapper label {
+    font-size: 0.9em;
+    color: #495057;
+    font-weight: 500;
+}
+
+.num-buttons-select {
+    padding: 12px 16px;
+    font-size: 1em;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background-color: white;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.num-buttons-select:hover {
+    border-color: #667eea;
+}
+
+.num-buttons-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 @media (max-width: 768px) {
